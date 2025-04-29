@@ -1,145 +1,192 @@
-const startBtn = document.getElementById("start-btn");
-const deviceContainer = document.getElementById("device-selection");
-const modeContainer = document.getElementById("mode-selection");
-const board = document.getElementById("board");
-const statusText = document.getElementById("status");
-const restartBtn = document.getElementById("restart");
-const scoreDisplay = document.getElementById("score");
-const confettiCanvas = document.getElementById("confetti");
+// Sound effects
+const startSound = new Audio('button-305770.mp3');
+const moveSound = new Audio('match-cave-164967.mp3');
+const winSound = new Audio('success-fanfare-trumpets-6185.mp3');
 
-let currentPlayer = "X";
-let gameBoard = ["", "", "", "", "", "", "", "", ""];
-let gameActive = false;
-let gameMode = "";
-let scores = { X: 0, O: 0 };
-let winnerDeclared = false;
+// DOM elements
+const startScreen = document.getElementById('start-screen');
+const deviceScreen = document.getElementById('device-screen');
+const modeScreen = document.getElementById('mode-screen');
+const gameScreen = document.getElementById('game-screen');
+const statusDisplay = document.getElementById('status');
+const board = document.getElementById('board');
+const cells = document.querySelectorAll('.cell');
+const restartBtn = document.getElementById('restart-button');
+const title = document.getElementById('title');
+const confetti = document.getElementById('confetti-canvas');
 
-// Load sound effects
-const clickSound = new Audio("button-305770.mp3");
-const winSound = new Audio("success-fanfare-trumpets-6185.mp3");
-const gameStartSound = new Audio("match-cave-164967.mp3");
+// State
+let currentPlayer = 'X';
+let gameBoard = ['', '', '', '', '', '', '', '', ''];
+let gameActive = true;
+let mode = '';
+let scoreX = 0;
+let scoreO = 0;
 
-// Confetti setup using JSConfetti (optional library)
-// Load JSConfetti if not using canvas
-let jsConfetti = null;
-if (confettiCanvas) {
-  jsConfetti = new JSConfetti({ canvas: confettiCanvas });
-}
-
-startBtn.addEventListener("click", () => {
-  clickSound.play();
-  startBtn.style.display = "none";
-  deviceContainer.style.display = "flex";
+// Start game
+document.getElementById('start-button').addEventListener('click', () => {
+    startSound.play();
+    startScreen.style.display = 'none';
+    deviceScreen.style.display = 'flex';
 });
 
-document.querySelectorAll(".device-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    clickSound.play();
-    deviceContainer.style.display = "none";
-    modeContainer.style.display = "flex";
-    document.body.classList.add(btn.dataset.device);
-  });
+// Device selection
+document.getElementById('mobile-btn').addEventListener('click', () => {
+    document.body.className = 'mobile';
+    deviceScreen.style.display = 'none';
+    modeScreen.style.display = 'flex';
 });
 
-document.querySelectorAll(".mode-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    clickSound.play();
-    modeContainer.style.display = "none";
-    gameMode = btn.dataset.mode;
-    initGame();
-  });
+document.getElementById('desktop-btn').addEventListener('click', () => {
+    document.body.className = 'desktop';
+    deviceScreen.style.display = 'none';
+    modeScreen.style.display = 'flex';
 });
 
-function initGame() {
-  board.style.display = "grid";
-  statusText.style.display = "block";
-  restartBtn.style.display = "inline-block";
-  scoreDisplay.style.display = "block";
-  gameBoard = ["", "", "", "", "", "", "", "", ""];
-  currentPlayer = "X";
-  gameActive = true;
-  winnerDeclared = false;
-  updateStatus();
-  clearBoard();
-  updateScore();
-  gameStartSound.play();
+// Mode selection
+document.getElementById('two-player-btn').addEventListener('click', () => {
+    mode = '2player';
+    modeScreen.style.display = 'none';
+    startGame();
+});
+
+document.getElementById('computer-btn').addEventListener('click', () => {
+    mode = 'computer';
+    modeScreen.style.display = 'none';
+    startGame();
+});
+
+function startGame() {
+    gameScreen.style.display = 'flex';
+    statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+    updateScores();
 }
 
-function updateStatus() {
-  statusText.textContent = `Player ${currentPlayer}'s turn`;
-}
+// Click on cell
+cells.forEach(cell => {
+    cell.addEventListener('click', (e) => {
+        const index = e.target.getAttribute('data-cell-index');
+        if (gameBoard[index] !== '' || !gameActive) return;
 
-function clearBoard() {
-  document.querySelectorAll(".cell").forEach(cell => {
-    cell.textContent = "";
-  });
-}
+        moveSound.play();
+        gameBoard[index] = currentPlayer;
+        e.target.textContent = currentPlayer;
 
-function handleCellClick(e) {
-  const cell = e.target;
-  const index = parseInt(cell.dataset.cellIndex);
-  if (!gameActive || gameBoard[index]) return;
+        if (checkWinner()) {
+            statusDisplay.textContent = `Player ${currentPlayer} wins!`;
+            gameActive = false;
+            winSound.play();
+            triggerConfetti();
+            updateScore(currentPlayer);
+            setTimeout(resetBoard, 2000);
+            return;
+        }
 
-  gameBoard[index] = currentPlayer;
-  cell.textContent = currentPlayer;
-  clickSound.play();
+        if (!gameBoard.includes('')) {
+            statusDisplay.textContent = 'Draw!';
+            setTimeout(resetBoard, 1500);
+            return;
+        }
 
-  if (checkWin()) {
-    gameActive = false;
-    scores[currentPlayer]++;
-    updateScore();
-    statusText.textContent = `Player ${currentPlayer} wins!`;
-    winSound.play();
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
 
-    if (jsConfetti) jsConfetti.addConfetti();
+        if (mode === 'computer' && currentPlayer === 'O') {
+            setTimeout(() => {
+                computerMove();
+            }, 500);
+        }
+    });
+});
 
-    if (scores[currentPlayer] === 3) {
-      setTimeout(() => {
-        alert(`Winner 🏆: Player ${currentPlayer}`);
-        scores = { X: 0, O: 0 };
-        updateScore();
-      }, 1000);
-    } else {
-      setTimeout(initGame, 2000);
+// Computer Move
+function computerMove() {
+    const emptyIndices = gameBoard.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+    const randIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+    if (randIndex !== undefined) {
+        gameBoard[randIndex] = 'O';
+        cells[randIndex].textContent = 'O';
+        moveSound.play();
+        if (checkWinner()) {
+            statusDisplay.textContent = `Computer wins!`;
+            gameActive = false;
+            winSound.play();
+            triggerConfetti();
+            updateScore('O');
+            setTimeout(resetBoard, 2000);
+            return;
+        }
+
+        if (!gameBoard.includes('')) {
+            statusDisplay.textContent = 'Draw!';
+            setTimeout(resetBoard, 1500);
+            return;
+        }
+
+        currentPlayer = 'X';
+        statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
     }
-
-    return;
-  }
-
-  if (!gameBoard.includes("")) {
-    statusText.textContent = "It's a draw!";
-    gameActive = false;
-    setTimeout(initGame, 2000);
-    return;
-  }
-
-  currentPlayer = currentPlayer === "X" ? "O" : "X";
-  updateStatus();
 }
 
-function checkWin() {
-  const winPatterns = [
-    [0,1,2],[3,4,5],[6,7,8],
-    [0,3,6],[1,4,7],[2,5,8],
-    [0,4,8],[2,4,6]
-  ];
-  return winPatterns.some(pattern => {
-    const [a, b, c] = pattern;
-    return gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c];
-  });
+// Check winner
+function checkWinner() {
+    const winPatterns = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+
+    return winPatterns.some(([a, b, c]) => 
+        gameBoard[a] && gameBoard[a] === gameBoard[b] && gameBoard[a] === gameBoard[c]
+    );
 }
 
-function updateScore() {
-  scoreDisplay.textContent = `Score - X: ${scores.X} | O: ${scores.O}`;
+// Reset Board
+function resetBoard() {
+    gameBoard = ['', '', '', '', '', '', '', '', ''];
+    cells.forEach(cell => cell.textContent = '');
+    currentPlayer = 'X';
+    gameActive = true;
+    statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
 }
 
-restartBtn.addEventListener("click", () => {
-  clickSound.play();
-  scores = { X: 0, O: 0 };
-  initGame();
-});
+// Update scores
+function updateScore(winner) {
+    if (winner === 'X') scoreX++;
+    else scoreO++;
+    updateScores();
 
-// Add listeners to each cell
-document.querySelectorAll(".cell").forEach(cell => {
-  cell.addEventListener("click", handleCellClick);
-});
+    if (scoreX === 3 || scoreO === 3) {
+        statusDisplay.textContent = `Winner 🏆: ${winner === 'X' ? 'Player X' : mode === '2player' ? 'Player O' : 'Computer'}`;
+        gameActive = false;
+        setTimeout(resetGame, 4000);
+    }
+}
+
+function updateScores() {
+    document.getElementById('score-x').textContent = scoreX;
+    document.getElementById('score-o').textContent = scoreO;
+}
+
+// Reset game fully
+restartBtn.addEventListener('click', resetGame);
+
+function resetGame() {
+    scoreX = 0;
+    scoreO = 0;
+    updateScores();
+    resetBoard();
+    gameActive = true;
+    statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+}
+
+// Confetti effect
+function triggerConfetti() {
+    if (window.confetti) {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
+              }e
