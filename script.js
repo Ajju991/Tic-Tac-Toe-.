@@ -1,84 +1,143 @@
-const board = document.getElementById('board');
-const statusDisplay = document.getElementById('status');
-const resetButton = document.getElementById('reset-button');
+const startBtn = document.getElementById('start-button');
+const deviceSelect = document.getElementById('device-select');
+const modeSelect = document.getElementById('mode-select');
+const gameContainer = document.getElementById('game-container');
+const startScreen = document.getElementById('start-screen');
+const statusText = document.getElementById('status');
+const resetBtn = document.getElementById('reset-button');
+const cells = document.querySelectorAll('.cell');
 const clickSound = document.getElementById('clickSound');
-
+const winSound = document.getElementById('winSound');
+const bgMusic = document.getElementById('bgMusic');
 const scoreX = document.getElementById('scoreX');
 const scoreO = document.getElementById('scoreO');
 
 let currentPlayer = 'X';
-let gameBoard = ['', '', '', '', '', '', '', '', ''];
+let board = ['', '', '', '', '', '', '', '', ''];
 let gameActive = true;
-let scores = { X: 0, O: 0 };
+let score = { X: 0, O: 0 };
+let mode = '2p';
 
-function handleCellClick(event) {
-  const clickedCell = event.target;
-  const index = parseInt(clickedCell.getAttribute('data-cell-index'));
+startBtn.addEventListener('click', () => {
+  startScreen.classList.add('hidden');
+  deviceSelect.classList.remove('hidden');
+});
 
-  if (gameBoard[index] !== '' || !gameActive) return;
+deviceSelect.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    deviceSelect.classList.add('hidden');
+    modeSelect.classList.remove('hidden');
+  }
+});
 
-  clickSound.currentTime = 0;
+modeSelect.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON') {
+    mode = e.target.dataset.mode;
+    modeSelect.classList.add('hidden');
+    gameContainer.classList.remove('hidden');
+  }
+});
+
+cells.forEach(cell => {
+  cell.addEventListener('click', () => handleMove(cell));
+});
+
+resetBtn.addEventListener('click', () => {
+  score = { X: 0, O: 0 };
+  scoreX.textContent = '0';
+  scoreO.textContent = '0';
+  resetGame();
+});
+
+function handleMove(cell) {
+  const index = cell.getAttribute('data-cell-index');
+
+  if (board[index] !== '' || !gameActive) return;
+
+  board[index] = currentPlayer;
+  cell.textContent = currentPlayer;
   clickSound.play();
 
-  gameBoard[index] = currentPlayer;
-  clickedCell.textContent = currentPlayer;
-
   if (checkWinner()) {
-    statusDisplay.textContent = `Player ${currentPlayer} wins!`;
-    scores[currentPlayer]++;
+    winSound.play();
+    score[currentPlayer]++;
     updateScores();
+    showStatus(`${currentPlayer} wins!`);
+    if (score[currentPlayer] >= 3) {
+      showStatus(`${currentPlayer} is the WINNER 🏆`);
+      launchConfetti();
+    } else {
+      setTimeout(resetGame, 1500);
+    }
     gameActive = false;
     return;
   }
 
-  if (!gameBoard.includes('')) {
-    statusDisplay.textContent = "It's a draw!";
-    gameActive = false;
+  if (!board.includes('')) {
+    showStatus('Draw!');
+    setTimeout(resetGame, 1500);
     return;
   }
 
   currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-  statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
-}
-
-function checkWinner() {
-  const winPatterns = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ];
-
-  return winPatterns.some(pattern => {
-    const [a, b, c] = pattern;
-    return gameBoard[a] &&
-      gameBoard[a] === gameBoard[b] &&
-      gameBoard[a] === gameBoard[c];
-  });
+  showStatus(`Player ${currentPlayer}'s turn`);
 }
 
 function updateScores() {
-  scoreX.textContent = scores.X;
-  scoreO.textContent = scores.O;
+  scoreX.textContent = score.X;
+  scoreO.textContent = score.O;
+}
+
+function showStatus(message) {
+  statusText.textContent = message;
 }
 
 function resetGame() {
-  gameBoard = ['', '', '', '', '', '', '', '', ''];
+  board = ['', '', '', '', '', '', '', '', ''];
   currentPlayer = 'X';
   gameActive = true;
-  statusDisplay.textContent = `Player X's turn`;
-
-  document.querySelectorAll('.cell').forEach(cell => {
-    cell.textContent = '';
-  });
-
-  scores = { X: 0, O: 0 };
-  updateScores();
+  cells.forEach(cell => (cell.textContent = ''));
+  showStatus(`Player ${currentPlayer}'s turn`);
 }
 
-board.addEventListener('click', handleCellClick);
-resetButton.addEventListener('click', resetGame);
+function checkWinner() {
+  const wins = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  return wins.some(pattern => {
+    const [a, b, c] = pattern;
+    return board[a] && board[a] === board[b] && board[a] === board[c];
+  });
+}
+
+// Simple Confetti
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = Array.from({ length: 150 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    size: Math.random() * 10 + 2,
+    speed: Math.random() * 3 + 2,
+    color: `hsl(${Math.random() * 360}, 100%, 50%)`
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+      p.y += p.speed;
+      if (p.y > canvas.height) p.y = -10;
+    });
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+  setTimeout(() => (ctx.clearRect(0, 0, canvas.width, canvas.height)), 3000);
+                    }
