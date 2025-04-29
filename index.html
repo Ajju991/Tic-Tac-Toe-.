@@ -1,38 +1,59 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tic Tac Toe</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>  <h1 class="game-title">Tic Tac Toe</h1>  <!-- Start Screen -->  <div id="start-screen" class="screen active">
-    <button id="start-btn">Start</button>
-  </div>  <!-- Device Select Screen -->  <div id="device-screen" class="screen">
-    <h2>Select Device</h2>
-    <button class="device-btn" data-device="mobile">Mobile</button>
-    <button class="device-btn" data-device="desktop">Desktop</button>
-  </div>  <!-- Mode Select Screen -->  <div id="mode-screen" class="screen">
-    <h2>Select Mode</h2>
-    <button class="mode-btn" data-mode="2player">2 Player</button>
-    <button class="mode-btn" data-mode="computer">Computer</button>
-  </div>  <!-- Game Screen -->  <div id="game-screen" class="screen">
-    <div id="scoreboard">
-      <p><span id="player1-name">Player 1</span>: <span id="player1-score">0</span></p>
-      <p><span id="player2-name">Player 2</span>: <span id="player2-score">0</span></p>
-    </div><div class="board" id="board">
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
-  <div class="cell" data-cell></div>
+<body>
+  <div class="game-container">
+    <h1 class="game-title">Tic Tac Toe</h1><!-- Start Screen -->
+<div class="start-screen">
+  <button id="startBtn">Start</button>
 </div>
 
-<div class="message" id="message"></div>
-<button id="restart-btn">Restart</button>
+<!-- Device Selection -->
+<div class="device-screen hidden">
+  <h2>Select Device</h2>
+  <button id="mobileBtn">Mobile</button>
+  <button id="desktopBtn">Desktop</button>
+</div>
 
-  </div>  <script src="script.js"></script></body>
-    </html>
+<!-- Mode Selection -->
+<div class="mode-screen hidden">
+  <h2>Select Mode</h2>
+  <button id="twoPlayerBtn">2 Player</button>
+  <button id="computerBtn">Computer</button>
+</div>
+
+<!-- Game Interface -->
+<div class="game-screen hidden">
+  <div class="scoreboard">
+    <div id="playerXScore">Player X: 0</div>
+    <div id="playerOScore">Player O: 0</div>
+  </div>
+  <div class="board" id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+  </div>
+  <div id="status"></div>
+  <button id="restartBtn">Restart</button>
+</div>
+
+<!-- Winner Overlay -->
+<div class="winner-screen hidden">
+  <h2 id="winnerMsg"></h2>
+  <button id="resetGame">Play Again</button>
+</div>
+
+  </div>  <!-- Sounds --><audio id="clickSound" src="sounds/button-click.mp3"></audio> <audio id="drawSound" src="sounds/match-cave.mp3"></audio> <audio id="winSound" src="sounds/success-fanfare.mp3"></audio>
+
+  <script src="script.js"></script></body>
+                                                                                </html>
