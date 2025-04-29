@@ -3,54 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tic Tac Toe Showdown</title>
+  <title>Tic Tac Toe</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <audio id="clickSound" src="button-clickk(chosic.com).mp3"></audio>
-  <audio id="winSound" src="success-fanfare-trumpets-6185.mp3"></audio>
-  <audio id="bgMusic" src="match-cave-164967.mp3" loop autoplay></audio>
-
+  <h1 class="game-title">Tic Tac Toe</h1>
+  
   <div id="start-screen">
-    <h1>Tic Tac Toe Showdown</h1>
     <button id="start-button">Start</button>
   </div>
 
   <div id="device-select" class="hidden">
     <h2>Select Device</h2>
-    <button data-device="mobile">Mobile</button>
-    <button data-device="desktop">Desktop</button>
+    <button onclick="selectDevice('mobile')">Mobile</button>
+    <button onclick="selectDevice('desktop')">Desktop</button>
   </div>
 
   <div id="mode-select" class="hidden">
     <h2>Select Mode</h2>
-    <button data-mode="2p">2 Player</button>
-    <button data-mode="cpu">Computer</button>
+    <button onclick="selectMode('2player')">2 Player</button>
+    <button onclick="selectMode('computer')">Computer</button>
   </div>
 
   <div id="game-container" class="hidden">
-    <h1>Tic Tac Toe Showdown</h1>
     <div id="scoreboard">
-      <span>X: <span id="scoreX">0</span></span>
-      <span>O: <span id="scoreO">0</span></span>
+      <span id="playerX-score">Player X: 0</span>
+      <span id="playerO-score">Player O: 0</span>
     </div>
     <div id="status">Player X's turn</div>
-    <div id="board">
-      <button class="cell" data-cell-index="0"></button>
-      <button class="cell" data-cell-index="1"></button>
-      <button class="cell" data-cell-index="2"></button>
-      <button class="cell" data-cell-index="3"></button>
-      <button class="cell" data-cell-index="4"></button>
-      <button class="cell" data-cell-index="5"></button>
-      <button class="cell" data-cell-index="6"></button>
-      <button class="cell" data-cell-index="7"></button>
-      <button class="cell" data-cell-index="8"></button>
-    </div>
-    <button id="reset-button">Restart</button>
+    <div id="board"></div>
+    <button id="restart-button">Restart</button>
   </div>
 
   <canvas id="confetti-canvas"></canvas>
 
   <script src="script.js"></script>
 </body>
-        </html>
+</html>
