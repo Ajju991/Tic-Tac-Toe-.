@@ -1,31 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
 <body>
 
-    <div id="start-screen">
-        <h1>Tic Tac Toe</h1>
-        <div id="mode-selection">
-            <button class="mode-button" data-mode="2p">2 Player</button>
-            <button class="mode-button" data-mode="cpu">Vs Computer</button>
-        </div>
-    </div>
+  <div id="start-screen">
+    <button id="start-button">Start Game</button>
+  </div>
 
-    <div id="game-container" style="display: none;">
-        <h1>Tic Tac Toe</h1>
-        <div id="status">Player X's turn</div>
-        <div id="board">
-            <button class="cell" data-cell-index="0"></button>
-            <button class="cell" data-cell-index="1"></button>
-            <button class="cell" data-cell-index="2"></button>
-            <button class="cell" data-cell-index="3"></button>
-            <button class="cell" data-cell-index="4"></button>
-            <button class="cell" data-cell-index="5"></button>
-            <button class="cell" data-cell-index="6"></button>
-            <button class="cell" data-cell-index="7"></button>
-            <button class="cell" data-cell-index="8"></button>
-        </div>
-        <div id="reset-container">
-            <button id="reset-button">Restart Game</button>
-        </div>
-    </div>
+  <div id="device-screen" class="hidden">
+    <h2>Select Device</h2>
+    <button class="device-btn" data-device="mobile">Mobile</button>
+    <button class="device-btn" data-device="desktop">Desktop</button>
+  </div>
 
-    <script src="script.js"></script>
+  <div id="mode-screen" class="hidden">
+    <h2>Select Mode</h2>
+    <button class="mode-btn" data-mode="2player">2 Player</button>
+    <button class="mode-btn" data-mode="computer">Computer</button>
+  </div>
+
+  <div id="game-container" class="hidden">
+    <h1>Tic Tac Toe</h1>
+    <div id="score-board">
+      <span id="playerX-score">X: 0</span>
+      <span id="playerO-score">O: 0</span>
+    </div>
+    <div id="status">Player X's turn</div>
+    <div id="board">
+      <button class="cell" data-cell-index="0"></button>
+      <button class="cell" data-cell-index="1"></button>
+      <button class="cell" data-cell-index="2"></button>
+      <button class="cell" data-cell-index="3"></button>
+      <button class="cell" data-cell-index="4"></button>
+      <button class="cell" data-cell-index="5"></button>
+      <button class="cell" data-cell-index="6"></button>
+      <button class="cell" data-cell-index="7"></button>
+      <button class="cell" data-cell-index="8"></button>
+    </div>
+    <div id="reset-container">
+      <button id="reset-button">Restart Game</button>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas" class="hidden"></canvas>
+
+  <audio id="move-sound" src="sounds/move.wav"></audio>
+  <audio id="win-sound" src="sounds/win.wav"></audio>
+  <audio id="draw-sound" src="sounds/draw.wav"></audio>
+
+  <script src="script.js"></script>
 </body>
+                                                   </html>
