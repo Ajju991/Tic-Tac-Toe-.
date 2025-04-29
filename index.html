@@ -4,49 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tic Tac Toe Showdown</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- Start Screen -->
-  <div id="start-screen" class="screen">
+  <div class="container">
     <h1>Tic Tac Toe Showdown</h1>
-    <button id="start-button">Start Game</button>
-  </div>
 
-  <!-- Device Select -->
-  <div id="device-screen" class="screen" style="display:none;">
-    <h2>Select Device</h2>
-    <button class="device-btn">Mobile</button>
-    <button class="device-btn">Desktop</button>
-  </div>
+    <div class="game-container">
+      <div class="score-board">
+        <p>Player X: <span id="scoreX">0</span></p>
+        <p>Player O: <span id="scoreO">0</span></p>
+      </div>
 
-  <!-- Mode Select -->
-  <div id="mode-screen" class="screen" style="display:none;">
-    <h2>Select Mode</h2>
-    <button class="mode-btn">2 Player</button>
-    <button class="mode-btn">Computer</button>
-  </div>
-
-  <!-- Game Screen -->
-  <div id="game-container" style="display:none;">
-    <h2 id="status">Player X's Turn</h2>
-    <div id="board">
-      <div class="cell" data-cell-index="0"></div>
-      <div class="cell" data-cell-index="1"></div>
-      <div class="cell" data-cell-index="2"></div>
-      <div class="cell" data-cell-index="3"></div>
-      <div class="cell" data-cell-index="4"></div>
-      <div class="cell" data-cell-index="5"></div>
-      <div class="cell" data-cell-index="6"></div>
-      <div class="cell" data-cell-index="7"></div>
-      <div class="cell" data-cell-index="8"></div>
+      <div id="board" class="board">
+        <button class="cell" data-cell-index="0"></button>
+        <button class="cell" data-cell-index="1"></button>
+        <button class="cell" data-cell-index="2"></button>
+        <button class="cell" data-cell-index="3"></button>
+        <button class="cell" data-cell-index="4"></button>
+        <button class="cell" data-cell-index="5"></button>
+        <button class="cell" data-cell-index="6"></button>
+        <button class="cell" data-cell-index="7"></button>
+        <button class="cell" data-cell-index="8"></button>
+      </div>
     </div>
-    <button id="reset-button">Restart</button>
-    <h3 id="final-winner"></h3>
+
+    <div id="status" class="status">Player X's turn</div>
+
+    <button id="reset-button">Restart Game</button>
+
+    <audio id="clickSound" src="button-clickk(chosic.com).mp3"></audio>
   </div>
 
-  <!-- JS + Sounds -->
   <script src="script.js"></script>
 </body>
-  </html>
+    </html>
