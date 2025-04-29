@@ -1,65 +1,85 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <h1>Tic Tac Toe</h1>
+    <div id="status">Player X's turn</div>
+    <div id="board">
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+      <button class="cell"></button>
+    </div>
+    <div id="reset-container">
+      <button id="reset-button">Restart Game</button>
+    </div>
+  </div>
 
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f9;
-}
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    const status = document.getElementById('status');
+    const resetBtn = document.getElementById('reset-button');
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let gameState = ["", "", "", "", "", "", "", "", ""];
 
-#game-container {
-    text-align: center;
-}
+    const winningConditions = [
+      [0,1,2], [3,4,5], [6,7,8],
+      [0,3,6], [1,4,7], [2,5,8],
+      [0,4,8], [2,4,6]
+    ];
 
-h1 {
-    margin-bottom: 20px;
-}
+    function handleClick(e) {
+      const index = [...cells].indexOf(e.target);
+      if (gameState[index] !== "" || !gameActive) return;
+      gameState[index] = currentPlayer;
+      e.target.textContent = currentPlayer;
+      checkResult();
+    }
 
-#status {
-    font-size: 18px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
+    function checkResult() {
+      let roundWon = false;
+      for (let condition of winningConditions) {
+        const [a,b,c] = condition;
+        if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+          roundWon = true;
+          break;
+        }
+      }
+      if (roundWon) {
+        status.textContent = `Player ${currentPlayer} Wins!`;
+        gameActive = false;
+        return;
+      }
+      if (!gameState.includes("")) {
+        status.textContent = "Draw!";
+        gameActive = false;
+        return;
+      }
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      status.textContent = `Player ${currentPlayer}'s turn`;
+    }
 
-#board {
-    display: grid;
-    grid-template-columns: repeat(3, 100px);
-    grid-gap: 10px;
-    margin-bottom: 20px;
-}
+    function resetGame() {
+      gameState = ["", "", "", "", "", "", "", "", ""];
+      currentPlayer = 'X';
+      gameActive = true;
+      cells.forEach(cell => cell.textContent = "");
+      status.textContent = `Player ${currentPlayer}'s turn`;
+    }
 
-.cell {
-    width: 100px;
-    height: 100px;
-    font-size: 24px;
-    background-color: #f2f2f2;
-    border: 2px solid #ddd;
-    cursor: pointer;
-}
-
-.cell:focus {
-    outline: none;
-}
-
-#reset-container {
-    margin-top: 20px;
-}
-
-#reset-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-#reset-button:hover {
-    background-color: #45a049;
-}
+    cells.forEach(cell => cell.addEventListener('click', handleClick));
+    resetBtn.addEventListener('click', resetGame);
+  </script>
+</body>
+    </html>
