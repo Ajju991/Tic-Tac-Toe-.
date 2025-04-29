@@ -1,126 +1,42 @@
-const startScreen = document.getElementById("start-screen");
-const deviceSelect = document.getElementById("device-select");
-const modeSelect = document.getElementById("mode-select");
-const gameContainer = document.getElementById("game-container");
-const board = document.getElementById("board");
-const status = document.getElementById("status");
-const restartBtn = document.getElementById("restart-button");
-const playerXScoreSpan = document.getElementById("playerX-score");
-const playerOScoreSpan = document.getElementById("playerO-score");
+// === Tic Tac Toe Game Logic with Sounds and Mode ===
 
-let currentPlayer = "X";
-let gameBoard = ["", "", "", "", "", "", "", "", ""];
-let scores = { X: 0, O: 0 };
-let winnerDeclared = false;
-let gameMode = "";
-let wins = { X: 0, O: 0 };
-let gameCount = 0;
+let currentPlayer = 'X'; let board = ['', '', '', '', '', '', '', '', '']; let isGameActive = false; let gameMode = ''; let scores = { X: 0, O: 0 }; let winCount = { X: 0, O: 0 };
 
-// Load sounds
-const clickSound = new Audio("button-clickk(chosic.com).mp3");
-const winSound = new Audio("success-fanfare-trumpets-6185.mp3");
-const drawSound = new Audio("match-cave-164967.mp3");
+const winSound = new Audio('/sounds/success-fanfare-trumpets-6185.mp3'); const drawSound = new Audio('/sounds/match-cave-164967.mp3'); const clickSound = new Audio('/sounds/button-clickk(chosic.com).mp3');
 
-document.getElementById("start-button").addEventListener("click", () => {
-  clickSound.play();
-  startScreen.classList.add("hidden");
-  deviceSelect.classList.remove("hidden");
-});
+const cells = document.querySelectorAll('.cell'); const gameStatus = document.querySelector('.game-status'); const gameBoard = document.querySelector('.game-board'); const startButton = document.getElementById('start-button'); const deviceButtons = document.getElementById('device-select'); const modeButtons = document.getElementById('mode-select'); const scoreBoard = document.querySelector('.score-board'); const restartButton = document.getElementById('restart');
 
-window.selectDevice = (device) => {
-  clickSound.play();
-  deviceSelect.classList.add("hidden");
-  modeSelect.classList.remove("hidden");
-};
+startButton.addEventListener('click', () => { clickSound.play(); startButton.style.display = 'none'; deviceButtons.style.display = 'flex'; });
 
-window.selectMode = (mode) => {
-  clickSound.play();
-  modeSelect.classList.add("hidden");
-  gameContainer.classList.remove("hidden");
-  gameMode = mode;
-  startGame();
-};
+document.getElementById('mobile').addEventListener('click', () => { clickSound.play(); document.body.classList.add('mobile'); deviceButtons.style.display = 'none'; modeButtons.style.display = 'flex'; });
 
-function startGame() {
-  board.innerHTML = "";
-  gameBoard = ["", "", "", "", "", "", "", "", ""];
-  currentPlayer = "X";
-  winnerDeclared = false;
-  status.textContent = `Player ${currentPlayer}'s turn`;
-  for (let i = 0; i < 9; i++) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
-    cell.dataset.index = i;
-    cell.addEventListener("click", handleCellClick);
-    board.appendChild(cell);
-  }
-}
+document.getElementById('desktop').addEventListener('click', () => { clickSound.play(); document.body.classList.remove('mobile'); deviceButtons.style.display = 'none'; modeButtons.style.display = 'flex'; });
 
-function handleCellClick(e) {
-  const idx = e.target.dataset.index;
-  if (gameBoard[idx] !== "" || winnerDeclared) return;
-  if (gameMode === "computer" && currentPlayer === "O") return;
+document.getElementById('two-player').addEventListener('click', () => { clickSound.play(); gameMode = '2player'; modeButtons.style.display = 'none'; gameBoard.style.display = 'grid'; scoreBoard.style.display = 'flex'; isGameActive = true; });
 
-  clickSound.play();
-  gameBoard[idx] = currentPlayer;
-  e.target.textContent = currentPlayer;
+document.getElementById('computer').addEventListener('click', () => { clickSound.play(); gameMode = 'computer'; modeButtons.style.display = 'none'; gameBoard.style.display = 'grid'; scoreBoard.style.display = 'flex'; isGameActive = true; });
 
-  if (checkWinner()) {
-    winSound.play();
-    scores[currentPlayer]++;
-    updateScore();
-    status.textContent = `Player ${currentPlayer} wins!`;
-    winnerDeclared = true;
-    gameCount++;
-    if (scores[currentPlayer] >= 3) {
-      showConfetti();
-      alert(`Winner 🏆: Player ${currentPlayer}`);
-      scores = { X: 0, O: 0 };
-    }
-    setTimeout(startGame, 1500);
-  } else if (!gameBoard.includes("")) {
-    drawSound.play();
-    status.textContent = "Draw!";
-    setTimeout(startGame, 1500);
-  } else {
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
-    status.textContent = `Player ${currentPlayer}'s turn`;
-    if (gameMode === "computer" && currentPlayer === "O") {
-      setTimeout(computerMove, 500);
-    }
-  }
-}
+cells.forEach((cell, index) => { cell.addEventListener('click', () => handleCellClick(index)); });
 
-function computerMove() {
-  let empty = gameBoard.map((v, i) => v === "" ? i : null).filter(i => i !== null);
-  let random = empty[Math.floor(Math.random() * empty.length)];
-  const cell = document.querySelector(`.cell[data-index='${random}']`);
-  if (cell) cell.click();
-}
+function handleCellClick(index) { if (!isGameActive || board[index] !== '') return; if (gameMode === 'computer' && currentPlayer === 'O') return;
 
-function updateScore() {
-  playerXScoreSpan.textContent = `Player X: ${scores.X}`;
-  playerOScoreSpan.textContent = `Player O: ${scores.O}`;
-}
+clickSound.play(); board[index] = currentPlayer; cells[index].textContent = currentPlayer;
 
-restartBtn.addEventListener("click", () => {
-  clickSound.play();
-  scores = { X: 0, O: 0 };
-  updateScore();
-  startGame();
-});
+if (checkWinner()) { winSound.play(); scores[currentPlayer]++; updateScore(); gameStatus.textContent = ${currentPlayer} wins!; isGameActive = false; winCount[currentPlayer]++; if (winCount[currentPlayer] === 3) { setTimeout(() => showWinner(currentPlayer), 1000); } else { setTimeout(resetBoard, 1500); } return; }
 
-// Confetti setup
-function showConfetti() {
-  const duration = 2 * 1000;
-  const animationEnd = Date.now() + duration;
-  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+if (!board.includes('')) { drawSound.play(); gameStatus.textContent = 'Draw!'; setTimeout(resetBoard, 1500); return; }
 
-  const interval = setInterval(function () {
-    const timeLeft = animationEnd - Date.now();
-    if (timeLeft <= 0) return clearInterval(interval);
+currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; if (gameMode === 'computer' && currentPlayer === 'O') { setTimeout(computerMove, 800); } }
 
-    const particleCount = 50 * (timeLeft / duration);
-    confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
-  }, 250);
-  }
+function computerMove() { const emptyIndexes = board.map((val, i) => val === '' ? i : null).filter(i => i !== null); const move = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)]; handleCellClick(move); }
+
+function checkWinner() { const winCombos = [ [0,1,2],[3,4,5],[6,7,8], [0,3,6],[1,4,7],[2,5,8], [0,4,8],[2,4,6] ]; return winCombos.some(combo => { const [a,b,c] = combo; return board[a] && board[a] === board[b] && board[b] === board[c]; }); }
+
+function resetBoard() { board = ['', '', '', '', '', '', '', '', '']; cells.forEach(cell => cell.textContent = ''); currentPlayer = 'X'; gameStatus.textContent = Turn: ${currentPlayer}; isGameActive = true; }
+
+function updateScore() { document.getElementById('scoreX').textContent = scores['X']; document.getElementById('scoreO').textContent = scores['O']; }
+
+function showWinner(player) { document.body.innerHTML = <h1>${player} is the Winner! 🏆</h1> <canvas id="confetti"></canvas> <button onclick="location.reload()">Restart Game</button>; // Confetti code can be inserted here (JS library or custom) }
+
+restartButton.addEventListener('click', () => { clickSound.play(); board = ['', '', '', '', '', '', '', '', '']; scores = { X: 0, O: 0 }; winCount = { X: 0, O: 0 }; updateScore(); resetBoard(); gameStatus.textContent = 'Game Restarted'; });
+
